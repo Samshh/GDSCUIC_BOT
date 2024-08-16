@@ -28,9 +28,24 @@ async def on_ready():
         print(f'Loaded prefix: {PREFIX}')
     else:
         print('No prefix loaded.')
+    await update_presence()
 
 def has_admin_permissions(interaction: discord.Interaction):
     return interaction.user.guild_permissions.administrator
+
+@client.event
+async def on_member_join(member):
+    print(f'{member} has joined the server {member.guild.name}!')
+    await update_presence()
+
+async def update_presence():
+    if client.is_ready():
+        total_member_count = sum(guild.member_count for guild in client.guilds if guild.member_count)
+        activity = discord.Activity(name=f"over {total_member_count} Developers!", type=discord.ActivityType.watching)
+        await client.change_presence(activity=activity)
+        print('Bot presence updated!')
+    else:
+        print('Bot not ready, presence update skipped.')
 
 class RuleMakerModal(ui.Modal, title="Create Rules"):
     rule_title = ui.TextInput(label="Title", placeholder="Enter the title of the rules")
